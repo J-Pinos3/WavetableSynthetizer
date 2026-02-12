@@ -13,7 +13,7 @@ class WavetableSynthesizerViewModel: ViewModel() {
     var wavetableSynthesizer: WavetableSynthesizer? = null
     set(value){
         field = value
-        //applyParametters()
+        applyParameters()
     }
 
     private val _frequency = MutableLiveData(300F)
@@ -27,13 +27,13 @@ class WavetableSynthesizerViewModel: ViewModel() {
         val frequencyInHz = frequencyInHzFromSliderPosition(frequencySliderPosition)
         _frequency.value  = frequencyInHz
         viewModelScope.launch{
-            wavetableSynthesizer?.setFrequency(frequencySliderPosition)
+            wavetableSynthesizer?.setFrequency(frequencyInHz)
         }
 
     }
 
 
-    private val frequencyRange =  40F .. 3100F
+    private val frequencyRange =  40F .. 3000F
 
     private fun frequencyInHzFromSliderPosition(sliderPosition: Float): Float{
         val rangePosition = linearToExponential(sliderPosition)
@@ -138,6 +138,16 @@ class WavetableSynthesizerViewModel: ViewModel() {
             }else{
                 _playButtonLabel.value = R.string.play
             }
+        }
+    }
+
+
+    fun applyParameters(){
+        viewModelScope.launch {
+            wavetableSynthesizer?.setFrequency( frequency.value!! )
+            wavetableSynthesizer?.setVolume( volume.value!! )
+            wavetableSynthesizer?.setWavetable( wavetable )
+            updatePlayButtonLabel()
         }
     }
 

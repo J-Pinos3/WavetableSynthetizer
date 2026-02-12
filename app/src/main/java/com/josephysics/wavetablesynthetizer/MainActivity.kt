@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,6 +33,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -46,41 +48,54 @@ import androidx.compose.ui.unit.dp
 import com.josephysics.wavetablesynthetizer.ui.theme.WavetableSynthetizerTheme
 
 class MainActivity : ComponentActivity() {
+    private val synthesizerViewModel: WavetableSynthesizerViewModel by viewModels()
+    private val synthesizer = LoggingWavetableSynthesizer()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        synthesizerViewModel.wavetableSynthesizer = synthesizer
         setContent {
             WavetableSynthetizerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ){
-                    WavetableSynthetizerApp(Modifier)
+                    WavetableSynthetizerApp(Modifier,synthesizerViewModel)
                 }
             }
         }
     }
+
+    override fun onResume(){
+        super.onResume()
+        synthesizerViewModel.applyParameters()//make sure viewmodel remember values
+    }
+
 }
 
 @Composable
 fun WavetableSynthetizerApp(
-    modifier: Modifier
+    modifier: Modifier,
+    synthesizerViewModel: WavetableSynthesizerViewModel
 ){
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ){
-        WavetableSelectionPanel(modifier)
-        ControlsPanel(modifier)
+        WavetableSelectionPanel(modifier,synthesizerViewModel)
+        ControlsPanel(modifier, synthesizerViewModel)
     }
 }
 
 
 @Composable
 fun WavetableSelectionPanel(
-    modifier: Modifier
+    modifier: Modifier,
+    synthesizerViewModel: WavetableSynthesizerViewModel
 ){
     Row(
        modifier = modifier.fillMaxWidth()
@@ -94,7 +109,7 @@ fun WavetableSelectionPanel(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Text(stringResource(R.string.wavetable))
-            WavetableSelectionButtons(modifier)
+            WavetableSelectionButtons(modifier, synthesizerViewModel)
         }
     }
 }
@@ -102,17 +117,18 @@ fun WavetableSelectionPanel(
 
 @Composable
 fun WavetableSelectionButtons(
-    modifier: Modifier
+    modifier: Modifier,
+    synthesizerViewModel: WavetableSynthesizerViewModel
 ){
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ){
-        for(wavetable in arrayOf("Sine","Triangle","Square","Saw")){
+        for(wavetable in Wavetable.values() ){
             WavetableButton(
                 modifier = modifier,
-                onClick = {},
-                label = wavetable
+                onClick = { synthesizerViewModel.setWavetable(wavetable) },
+                label =  stringResource( wavetable.toResourceString() )
             )
         }
     }
@@ -136,7 +152,8 @@ fun WavetableButton(
 
 @Composable
 fun ControlsPanel(
-    modifier: Modifier
+    modifier: Modifier,
+    synthesizerViewModel: WavetableSynthesizerViewModel
 ){
     Row(
         modifier = modifier
@@ -151,8 +168,8 @@ fun ControlsPanel(
                 .fillMaxWidth(0.7f),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            PitchControl(modifier)
-            PlayControl(modifier)
+            PitchControl(modifier, synthesizerViewModel)
+            PlayControl(modifier, synthesizerViewModel)
         }
 
 
@@ -161,7 +178,7 @@ fun ControlsPanel(
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            VolumeControl(modifier)
+            VolumeControl(modifier, synthesizerViewModel)
         }
     }
 }
@@ -169,17 +186,20 @@ fun ControlsPanel(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PitchControl(
-    modifier: Modifier
+    modifier: Modifier,
+    synthesizerViewModel: WavetableSynthesizerViewModel
 ){
-    var frequency = rememberSaveable { mutableStateOf(300F) }
+    val frequency = synthesizerViewModel.frequency.observeAsState()
 
     PitchControlContent(
         modifier = modifier,
         pitchControlLabel =  stringResource(R.string.frequency),
-        value = frequency.value,
-        onValueChange = {  frequency.value = it   },
-        valueRange = 40F..3100F,
-        frequencyValueLabel = "${frequency.value}"
+        value = synthesizerViewModel.sliderPositionFromFrequencyInHz(frequency.value!!),
+        onValueChange = {
+            synthesizerViewModel.setFrequencySliderPosition(it)
+        },
+        valueRange = 0F..1F,//40F..3100F,
+        frequencyValueLabel = stringResource(R.string.frequency_value, frequency.value!!)
     )
 }
 
@@ -202,28 +222,35 @@ fun PitchControlContent(
 
 @Composable
 fun PlayControl(
-    modifier: Modifier
+    modifier: Modifier,
+    synthesizerViewModel: WavetableSynthesizerViewModel
 ){
+
+    val playButtonLabel = synthesizerViewModel.playButtonLabel.observeAsState()
+
     Button(
         modifier = modifier,
-        onClick = {}
+        onClick = {
+            synthesizerViewModel.playClicked()
+        }
     ){
-        Text( stringResource(R.string.play) )
+        Text( stringResource(playButtonLabel.value!!) )
     }
 }
 
 
 @Composable
 fun VolumeControl(
-    modifier: Modifier
+    modifier: Modifier,
+    synthesizerViewModel: WavetableSynthesizerViewModel
 ){
-    var volume = rememberSaveable { mutableStateOf(-10F) }
+    val volume = synthesizerViewModel.volume.observeAsState()
 
     VolumeControlContent(
         modifier = modifier,
-        volumeValue = volume.value,
-        onValueChange = { volume.value = it },
-        valueRange = -60F .. 0F
+        volumeValue = volume.value!!,
+        onValueChange = { synthesizerViewModel.setVolume(it) },
+        valueRange = synthesizerViewModel.volumeRange
     )
 }
 
