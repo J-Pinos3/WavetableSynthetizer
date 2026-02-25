@@ -22,7 +22,7 @@ extern "C"{
     Java_com_josephysics_wavetablesynthetizer_NativeWavetableSynthesizer_delete(
         JNIEnv *env,jobject thiz,jlong synthesizer_handle) {
 
-        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer>(synthesizer_handle);
+        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer*>(synthesizer_handle);
 
         if(not synthesizer){
             LOGD("Attempt to destroy an uninitialized synthesizer");
@@ -38,7 +38,7 @@ extern "C"{
     Java_com_josephysics_wavetablesynthetizer_NativeWavetableSynthesizer_play(
         JNIEnv *env, jobject thiz,jlong synthesizer_handle) {
 
-        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer>(synthesizer_handle);
+        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer*>(synthesizer_handle);
 
         if(synthesizer){
             synthesizer->play();
@@ -51,7 +51,7 @@ extern "C"{
     Java_com_josephysics_wavetablesynthetizer_NativeWavetableSynthesizer_stop(
         JNIEnv *env, jobject thiz,jlong synthesizerHandle) {
 
-        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer>(synthesizerHandle);
+        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer*>(synthesizerHandle);
 
         if(synthesizer){
             synthesizer->stop();
@@ -64,7 +64,7 @@ extern "C"{
     Java_com_josephysics_wavetablesynthetizer_NativeWavetableSynthesizer_isPlaying(
         JNIEnv *env,jobject thiz,jlong synthesizerHandle) {
 
-        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer>(synthesizerHandle);
+        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer*>(synthesizerHandle);
 
         if(synthesizer){
             return synthesizer->isPlaying();
@@ -79,7 +79,7 @@ extern "C"{
     Java_com_josephysics_wavetablesynthetizer_NativeWavetableSynthesizer_setFrequency(
         JNIEnv *env,jobject thiz,jlong synthesizerHandle,jfloat frequencyInHz) {
 
-        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer>(synthesizerHandle);
+        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer*>(synthesizerHandle);
 
         if(synthesizer){
             synthesizer->setFrequency(  static_cast<float> (frequencyInHz)   );
@@ -92,7 +92,7 @@ extern "C"{
     Java_com_josephysics_wavetablesynthetizer_NativeWavetableSynthesizer_setVolume(
         JNIEnv *env,jobject thiz,jlong synthesizerHandle,jfloat volumeInDb) {
 
-        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer>(synthesizerHandle);
+        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer*>(synthesizerHandle);
 
         if(synthesizer){
             synthesizer->setVolume( static_cast<float> (volumeInDb) );
@@ -105,8 +105,8 @@ extern "C"{
     Java_com_josephysics_wavetablesynthetizer_NativeWavetableSynthesizer_setWavetable(
         JNIEnv *env,jobject thiz,jlong synthesizerHandle,jint wavetable) {
 
-        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer>(synthesizerHandle);
-        const auto nativeWavetable = static_cast<wavetablesynthesizer::Wavetable>(wavetable)
+        auto* synthesizer = reinterpret_cast<wavetablesynthesizer::WavetableSynthesizer*>(synthesizerHandle);
+        const auto nativeWavetable = static_cast<wavetablesynthesizer::Wavetable>(wavetable);
 
         if(synthesizer){
             synthesizer->setWavetable( nativeWavetable );

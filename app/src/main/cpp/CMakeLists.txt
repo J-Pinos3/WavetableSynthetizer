@@ -27,8 +27,13 @@ project("wavetablesynthetizer")
 # used in the AndroidManifest.xml file.
 add_library(${CMAKE_PROJECT_NAME} SHARED
     # List C/C++ source files with relative paths to this CMakeLists.txt.
+
+        WavetableSynthesizer.cpp
     wavetablesynthetizer.cpp)
 
+include_directories(
+        include
+)
 
 find_library(
         log-lib

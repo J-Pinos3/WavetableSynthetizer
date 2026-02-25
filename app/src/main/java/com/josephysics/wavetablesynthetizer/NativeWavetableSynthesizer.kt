@@ -25,7 +25,7 @@ class NativeWavetableSynthesizer: WavetableSynthesizer, DefaultLifecycleObserver
     /**a native library is a shared library, in this case, we load it statically*/
     companion object{
         init {
-            System.loadLibrary("wavetablesynthesizer")
+            System.loadLibrary("wavetablesynthetizer")
         }
     }
 
