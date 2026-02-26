@@ -1,19 +1,34 @@
 #include "include/Log.h"
 #include "include/WavetableSynthesizer.h"
+#include "OboeAudioPlayer.h"
+#include "WavetableOscillator.h"
 
 namespace wavetablesynthesizer{
 
+    WavetableSynthesizer::WavetableSynthesizer()
+    :_oscillator{  std::make_shared<A4Oscillator>(sampleRate)    },
+    _audioPlayer{ std::make_unique<OboeAudioPlayer>(_oscillator, sampleRate) }
+    {}
+
+
     void WavetableSynthesizer::play(){
         LOGD("play() called.");
-        _isPlaying = true;
+        const auto result  = _audioPlayer->play();
+        if(result == 0){
+            _isPlaying = true;
+        }else{
+            LOGD("could not start playback");
+        }
+
     }
 
     void WavetableSynthesizer::stop(){
         LOGD("stop() called.");
+        _audioPlayer->stop();
         _isPlaying = false;
     }
 
-    bool WavetableSynthesizer::isPlaying(){
+    bool WavetableSynthesizer::isPlaying() const{
         LOGD("isPlaying() called");
         return _isPlaying;
     }

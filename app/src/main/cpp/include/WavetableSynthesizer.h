@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 namespace wavetablesynthesizer{
 
 
@@ -8,10 +9,18 @@ namespace wavetablesynthesizer{
         SINE, TRIANGLE, SQUARE, SAW
     };
 
+
+    class AudioSource;
+    class AudioPlayer;
+
+    constexpr auto sampleRate = 48000;
+
+
     class WavetableSynthesizer{
     public:
+        WavetableSynthesizer();
         void stop();
-        bool isPlaying();
+        bool isPlaying() const;
         void setFrequency(float frequencyInHz);
         void setVolume(float volumeInDb);
         void setWavetable(Wavetable wavetable);
@@ -19,6 +28,8 @@ namespace wavetablesynthesizer{
 
     private:
         bool _isPlaying = false;
+        std::shared_ptr<AudioSource> _oscillator;
+        std::unique_ptr<AudioPlayer> _audioPlayer;
     };
 
 

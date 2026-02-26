@@ -5,8 +5,9 @@
 
 extern "C"{
 
-    JNIEXPORT jlong JNICALL
-    Java_com_josephysics_wavetablesynthetizer_NativeWavetableSynthesizer_create(JNIEnv *env, jobject thiz) {
+    JNIEXPORT jlong
+jlong
+Java_com_josephysics_wavetablesynthetizer_NativeWavetableSynthesizer_create(JNIEnv *env, jobject thiz) {
         auto synthesizer = std::make_unique<wavetablesynthesizer::WavetableSynthesizer>();
 
         if(not synthesizer){

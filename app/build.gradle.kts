@@ -16,9 +16,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk{
+            abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
+        }
+
         externalNativeBuild {
             cmake {
                 cppFlags += "-std=c++2a"
+                arguments +="-DANDROID_STL=c++_shared"
             }
         }
     }
@@ -41,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        prefab = true
     }
     externalNativeBuild {
         cmake {
@@ -63,6 +70,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("androidx.compose.runtime:runtime-livedata:1.10.2")
+    implementation("com.google.oboe:oboe:1.10.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -19,18 +19,18 @@ namespace wavetablesynthesizer{
                 builder.setPerformanceMode(PerformanceMode::LowLatency)
                 ->setDirection(Direction::Output)
                 ->setSampleRate(_samplingRate)
-                ->setDataCallBack(this)
+                ->setDataCallback(this)
                 ->setSharingMode(SharingMode::Exclusive)
-                ->serFormat(AudioFormat::Float)
+                ->setFormat(AudioFormat::Float)
                 ->setChannelCount(channelCount)
                 ->setSampleRateConversionQuality(SampleRateConversionQuality::Best)
                 ->openStream(_stream);
 
-        if(result != result::OK){
+        if(result != Result::OK){
             return static_cast<int32_t>(result);
         }
 
-        const auto playResult = _stream->RequestStart();
+        const auto playResult = _stream->requestStart();
 
         return static_cast<int32_t>(playResult);
     }
@@ -53,8 +53,14 @@ namespace wavetablesynthesizer{
         auto* floatData = reinterpret_cast<float*>(audioData);
 
         for(auto frame = 0; frame < framesCount; frame++){
+            const auto sample = _source->getSample();
 
+            for(auto channel = 0; channel < channelCount; channel++ ){
+                floatData[frame * channelCount +channel  ] = sample;
+            }
         }
+
+        return oboe::DataCallbackResult::Continue;
     }
 
 }
