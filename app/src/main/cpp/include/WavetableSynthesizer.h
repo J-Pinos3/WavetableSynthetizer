@@ -1,13 +1,9 @@
 #pragma once
 
 #include <memory>
+#include "Wavetable.h"
+
 namespace wavetablesynthesizer{
-
-
-
-    enum class Wavetable{
-        SINE, TRIANGLE, SQUARE, SAW
-    };
 
 
     class AudioSource;
@@ -19,6 +15,7 @@ namespace wavetablesynthesizer{
     class WavetableSynthesizer{
     public:
         WavetableSynthesizer();
+        ~WavetableSynthesizer();
         void stop();
         bool isPlaying() const;
         void setFrequency(float frequencyInHz);

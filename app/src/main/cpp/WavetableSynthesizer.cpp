@@ -10,6 +10,8 @@ namespace wavetablesynthesizer{
     _audioPlayer{ std::make_unique<OboeAudioPlayer>(_oscillator, sampleRate) }
     {}
 
+    WavetableSynthesizer::~WavetableSynthesizer() = default;
+
 
     void WavetableSynthesizer::play(){
         LOGD("play() called.");
