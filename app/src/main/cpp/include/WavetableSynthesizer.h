@@ -1,12 +1,14 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
+#include "WavetableFactory.h"
 #include "Wavetable.h"
 
 namespace wavetablesynthesizer{
 
 
-    class AudioSource;
+    class WavetableOscillator;
     class AudioPlayer;
 
     constexpr auto sampleRate = 48000;
@@ -24,8 +26,11 @@ namespace wavetablesynthesizer{
         void play();
 
     private:
-        bool _isPlaying = false;
-        std::shared_ptr<AudioSource> _oscillator;
+        std::atomic<bool> _isPlaying = false;
+        std::mutex _mutex;
+        WavetableFactory _wavetableFactory;
+        Wavetable _currentWavetable{Wavetable::SINE};
+        std::shared_ptr<WavetableOscillator> _oscillator;
         std::unique_ptr<AudioPlayer> _audioPlayer;
     };
 
